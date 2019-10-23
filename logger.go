@@ -1,7 +1,5 @@
 package logger
 
-import "errors"
-
 var log Logger
 
 //Fields Type to pass when we want to call WithFields for structured logging
@@ -18,15 +16,6 @@ const (
 	Error = "error"
 	//Fatal is for logging fatal messages. The sytem shutsdown after logging the message.
 	Fatal = "fatal"
-)
-
-const (
-	//InstanceZapLogger will be used to create Zap instance for the logger
-	InstanceZapLogger int = iota
-)
-
-var (
-	errInvalidLoggerInstance = errors.New("Invalid logger instance")
 )
 
 //Logger is our contract for the logger
@@ -59,16 +48,8 @@ type Configuration struct {
 }
 
 //NewLogger returns an instance of Logger
-func NewLogger(config Configuration, loggerInstance int) error {
-	if loggerInstance == InstanceZapLogger {
-		logger, err := newZapLogger(config)
-		if err != nil {
-			return err
-		}
-		log = logger
-		return nil
-	}
-	return errInvalidLoggerInstance
+func New(logger Logger)  {
+	log = logger
 }
 
 func Debugf(format string, args ...interface{}) {

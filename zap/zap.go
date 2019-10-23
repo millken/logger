@@ -1,19 +1,20 @@
-package logger
+package zap
 
 import (
 	"os"
 
-	"go.uber.org/zap"
+	"github.com/millken/logger"
+	z "go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 type zapLogger struct {
-	sugaredLogger *zap.SugaredLogger
+	sugaredLogger *z.SugaredLogger
 }
 
 func getEncoder(isJSON bool) zapcore.Encoder {
-	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig := z.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.TimeKey = "time"
 	if isJSON {
@@ -24,22 +25,22 @@ func getEncoder(isJSON bool) zapcore.Encoder {
 
 func getZapLevel(level string) zapcore.Level {
 	switch level {
-	case Info:
+	case logger.Info:
 		return zapcore.InfoLevel
-	case Warn:
+	case logger.Warn:
 		return zapcore.WarnLevel
-	case Debug:
+	case logger.Debug:
 		return zapcore.DebugLevel
-	case Error:
+	case logger.Error:
 		return zapcore.ErrorLevel
-	case Fatal:
+	case logger.Fatal:
 		return zapcore.FatalLevel
 	default:
 		return zapcore.InfoLevel
 	}
 }
 
-func newZapLogger(config Configuration) (Logger, error) {
+func New(config logger.Configuration) (logger.Logger, error) {
 	cores := []zapcore.Core{}
 
 	if config.EnableConsole {
@@ -63,9 +64,9 @@ func newZapLogger(config Configuration) (Logger, error) {
 
 	combinedCore := zapcore.NewTee(cores...)
 
-	logger := zap.New(combinedCore,
-		zap.AddCallerSkip(2),
-		zap.AddCaller(),
+	logger := z.New(combinedCore,
+		z.AddCallerSkip(2),
+		z.AddCaller(),
 	).Sugar()
 
 	return &zapLogger{
@@ -97,7 +98,7 @@ func (l *zapLogger) Panicf(format string, args ...interface{}) {
 	l.sugaredLogger.Fatalf(format, args...)
 }
 
-func (l *zapLogger) WithFields(fields Fields) Logger {
+func (l *zapLogger) WithFields(fields logger.Fields) logger.Logger {
 	var f = make([]interface{}, 0)
 	for k, v := range fields {
 		f = append(f, k)

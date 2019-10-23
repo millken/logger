@@ -104,6 +104,7 @@ func (l *zapLogger) WithFields(fields logger.Fields) logger.Logger {
 		f = append(f, k)
 		f = append(f, v)
 	}
+	
 	newLogger := l.sugaredLogger.With(f...)
 	return &zapLogger{newLogger}
 }

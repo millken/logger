@@ -47,12 +47,6 @@ func (l *oneLogger) Panicf(format string, args ...interface{}) {
 	l.logger.Fatal(fmt.Sprintf(format, args...))
 }
 
-func (l *oneLogger) WithFields(fields logger.Fields) Logger {
-	var f = make([]interface{}, 0)
-	for k, v := range fields {
-		f = append(f, k)
-		f = append(f, v)
-	}
-	newLogger := l.logger.With(f...)
-	return &oneLogger{newLogger}
+func (l *oneLogger) WithFields(fields logger.Fields) logger.Logger {
+	return l
 }

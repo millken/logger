@@ -1,21 +1,25 @@
 package logger
 
+import "strings"
+
 var log Logger
 
 //Fields Type to pass when we want to call WithFields for structured logging
 type Fields map[string]interface{}
 
+type Level string
+
 const (
 	//Debug has verbose message
-	Debug = "debug"
+	Debug Level = "debug"
 	//Info is default log level
-	Info = "info"
+	Info Level = "info"
 	//Warn is for logging messages about possible issues
-	Warn = "warn"
+	Warn Level = "warn"
 	//Error is for logging errors
-	Error = "error"
+	Error Level = "error"
 	//Fatal is for logging fatal messages. The sytem shutsdown after logging the message.
-	Fatal = "fatal"
+	Fatal Level = "fatal"
 )
 
 //Logger is our contract for the logger
@@ -40,15 +44,33 @@ type Logger interface {
 type Configuration struct {
 	EnableConsole     bool
 	ConsoleJSONFormat bool
-	ConsoleLevel      string
+	ConsoleLevel      Level
 	EnableFile        bool
 	FileJSONFormat    bool
-	FileLevel         string
+	FileLevel         Level
 	FileLocation      string
 }
 
-//NewLogger returns an instance of Logger
-func New(logger Logger)  {
+func GetLevel(level string) Level {
+	level = strings.ToLower(level)
+	switch level {
+	case "info":
+		return Info
+	case "warn":
+		return Warn
+	case "debug":
+		return Debug
+	case "error":
+		return Error
+	case "fatal":
+		return Fatal
+	default:
+		return Info
+	}
+}
+
+//New returns an instance of Logger
+func New(logger Logger) {
 	log = logger
 }
 
